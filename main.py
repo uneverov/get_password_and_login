@@ -1,7 +1,7 @@
 from Objects.Button import Button
 from Objects.Gpals import Gpals
 from Objects.Label import Label
-from Objects.Window import MainWindow, SecondWindow
+from Objects.Window import MainWindow
 
 window = MainWindow()
 gpals = Gpals().get_data()

@@ -10,10 +10,10 @@ class MainWindow(tkinter.Tk):
         self.attributes('-topmost', True)
 
 
-class SecondWindow(tkinter.Tk):
+class SaveCredentialWindow(tkinter.Tk):
     def __init__(self):
         super().__init__()
         self.title("Add new credentials")
-        self.geometry('400x400')
+        self.geometry('400x200')
         self.bind()
         self.attributes('-topmost', True)
