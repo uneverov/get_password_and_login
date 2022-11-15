@@ -1,23 +1,13 @@
-from Objects.Button import Button
+
 from Objects.Gpals import Gpals
-from Objects.Label import Label
-from Objects.Window import MainWindow
+
+from Objects.MenuButton import MenuBar
+from Objects.Window import MainWindow, place_buttons
 
 window = MainWindow()
-gpals = Gpals().get_data()
-
-# for i, (label, gpal) in enumerate(gpals.items()):
-#     gl, gp = str(gpal).split(';gpal;')
-#     Label(window=window,
-#           text=label,
-#           grid=(0, i + 1))
-#     Button(window=window,
-#            text='login',
-#            textvariable=gl,
-#            grid=(1, i + 1))
-#     Button(window=window,
-#            text='password',
-#            textvariable=gp,
-#            grid=(2, i + 1))
+window.config(bg='#141414')
+gpals = Gpals()
+menu_bar = MenuBar(window, gpals.gpals)
+place_buttons(gpals=gpals.gpals, window=window)
 
 window.mainloop()
