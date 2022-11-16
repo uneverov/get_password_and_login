@@ -1,6 +1,5 @@
 from tkinter import Menu
-
-from Objects.Window import SaveCredentialWindow
+from Objects.Windows import SaveCredentialWindow
 
 
 class MenuBar:
@@ -9,19 +8,16 @@ class MenuBar:
         self.window = window
         self.mainmenu = Menu(window)
         self.window.config(menu=self.mainmenu)
-        filemenu = Menu(self.mainmenu, tearoff=0)
-        filemenu.add_command(label="Add gpal", command=self.add)
-        filemenu.add_command(label="Delete gpal")
-        filemenu.add_command(label="Exit",
-                             command=self.exit)
-        self.mainmenu.add_cascade(label="---",
-                                  menu=filemenu)
+        self.filemenu = Menu(self.mainmenu, tearoff=0)
+        self.filemenu.add_command(label="Add gpal", command=self.add)
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label="Exit",
+                                  command=self.exit)
+        self.mainmenu.add_cascade(label="Menu",
+                                  menu=self.filemenu)
 
     def add(self):
-        add_gpal_window = SaveCredentialWindow(self.gpals, self.window)
-
-    def delete(self):
-        self.window.destroy()
+        SaveCredentialWindow(self.gpals, self.window)
 
     def exit(self):
         self.window.destroy()
