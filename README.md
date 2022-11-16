@@ -1,1 +1,1 @@
-# get_password_and_login
+# Save your credentials to clipboard by click
