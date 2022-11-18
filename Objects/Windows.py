@@ -1,7 +1,8 @@
 import tkinter
-import cryptocode
+
 import settings
 from Objects.Button import place_buttons
+from Objects.Cryptocode import encrypt
 from Objects.Gpals import write_json
 
 
@@ -29,14 +30,14 @@ class MainWindow(tkinter.Tk):
 class SaveCredentialWindow(tkinter.Tk):
     def __init__(self, gpals, window):
         super().__init__()
+        self.save_error_message = None
+        self.save_error_message_2 = None
         self.save_error_message_3 = None
         self.config(bg=settings.BLACK)
-        self.save_error_message_2 = None
         self.main_window = window
         self.credential_dicts = []
         self.gpals = gpals
         self.succes_message = None
-        self.save_error_message = None
         self.title("Add new gpals")
         self.geometry('400x200')
         self.bind()
@@ -70,6 +71,7 @@ class SaveCredentialWindow(tkinter.Tk):
         self.create_file_btn.grid(column=2, row=2, pady=10)
 
     def save_gpal_button(self):
+        # TODO reduse if conditions
         credential_dict = {'name': self.name_field.get(),
                            'login': self.login_field.get(),
                            'password': self.password_field.get()}
@@ -105,9 +107,8 @@ class SaveCredentialWindow(tkinter.Tk):
                                                       fg=settings.RED,
                                                       background=settings.BLACK)
             self.save_error_message_2.grid(column=1, row=4, pady=10)
-        if (all(credential_dict.values()) and not self.save_error_message_3
-                and credential_dict['name'] not in names
-                and credential_dict['name'] not in self.gpals):
+        if (all(credential_dict.values()) and credential_dict['name'] not in names
+                and credential_dict['name'] not in self.gpals and len(credential_dict['name']) <= 10):
             self.succes_message = tkinter.Label(self,
                                                 text=f'You saved {len(self.credential_dicts) + 1} gpals',
                                                 fg='green',
@@ -119,7 +120,7 @@ class SaveCredentialWindow(tkinter.Tk):
     def create_gpals_button(self):
         for i in self.credential_dicts:
             self.gpals.update(
-                {i['name']: ';gpal;'.join([cryptocode.encrypt(i['login'], 'login'), cryptocode.encrypt(i['password'], 'password')])})
+                {i['name']: ';gpal;'.join([encrypt(i['login'], 'login'), encrypt(i['password'], 'password')])})
         write_json(self.gpals)
         place_buttons(self.gpals, self.main_window)
         self.destroy()
