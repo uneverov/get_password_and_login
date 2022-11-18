@@ -5,6 +5,6 @@ from Objects.Windows import MainWindow
 
 window = MainWindow()
 gpals = Gpals()
-menu_bar = MenuBar(window, gpals.gpals)
+menu_bar = MenuBar(window, gpals)
 place_buttons(gpals=gpals.gpals, window=window)
 window.mainloop()

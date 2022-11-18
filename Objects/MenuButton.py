@@ -1,9 +1,13 @@
+
 from tkinter import Menu
+
+from Objects.Gpals import get_info_from_json
 from Objects.Windows import SaveCredentialWindow
 
 
 class MenuBar:
     def __init__(self, window, gpals):
+        self.gpals_content = None
         self.gpals = gpals
         self.window = window
         self.mainmenu = Menu(window)
@@ -17,7 +21,8 @@ class MenuBar:
                                   menu=self.filemenu)
 
     def add(self):
-        SaveCredentialWindow(self.gpals, self.window)
+        self.gpals_content = get_info_from_json(self.gpals.json_data)
+        SaveCredentialWindow(self.gpals_content, self.window)
 
     def exit(self):
         self.window.destroy()
