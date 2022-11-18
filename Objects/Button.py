@@ -1,7 +1,7 @@
 import tkinter
 from tkinter.messagebox import askquestion, showwarning
 
-import cryptocode
+from Objects.Cryptocode import decrypt
 
 import settings
 from Objects.Gpals import Gpals, write_json
@@ -26,11 +26,11 @@ def place_buttons(gpals, window, lables=False):
               grid=(0, i + 1))
         Button(window=window,
                text='get',
-               textvariable=cryptocode.decrypt(gl, 'login'),
+               textvariable=decrypt(gl, 'login'),
                grid=(1, i + 1))
         Button(window=window,
                text='get',
-               textvariable=cryptocode.decrypt(gp, 'password'),
+               textvariable=decrypt(gp, 'password'),
                grid=(2, i + 1))
         DeleteButton(window=window,
                      text='X',
