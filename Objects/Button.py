@@ -1,3 +1,4 @@
+import random
 import tkinter
 from tkinter.messagebox import askquestion, showwarning
 
@@ -8,8 +9,8 @@ from Objects.Gpals import Gpals, write_json
 from Objects.Label import Label
 
 
-def place_buttons(gpals, window, lables=False):
-    if lables:
+def place_buttons(gpals, window, labels=False):
+    if labels:
         login_lbl = tkinter.Label(text='l o g i n',
                                   background=settings.BLACK,
                                   foreground=settings.WHITE)
@@ -18,7 +19,8 @@ def place_buttons(gpals, window, lables=False):
                                      background=settings.BLACK,
                                      foreground=settings.WHITE)
         password_lbl.grid(column=2, row=0, padx=0, pady=5)
-
+        animate_label(login_lbl['text'], login_lbl)
+        animate_label(password_lbl['text'], password_lbl)
     for i, (label, gpal) in enumerate(gpals.items()):
         gl, gp = str(gpal).split(';gpal;')
         Label(window=window,
@@ -36,6 +38,13 @@ def place_buttons(gpals, window, lables=False):
                      text='X',
                      label=label,
                      grid=(3, i + 1))
+
+
+def animate_label(text, login_lbl):
+    login_lbl.after(2000, animate_label, text, login_lbl)
+    login_lbl['foreground'] = random.choice(
+        [x for x in list(settings.COLORS.values()) if x not in
+         [settings.VIOLET, settings.BLACK, settings.RED, settings.GREEN]])
 
 
 class Button:
@@ -82,6 +91,6 @@ class DeleteButton:
                     grid_object.destroy()
                 del self.gpals.gpals[self.label]
                 write_json(self.gpals.gpals)
-                place_buttons(self.gpals.gpals, self.window, lables=True)
+                place_buttons(self.gpals.gpals, self.window, labels=True)
         else:
             showwarning("Noup", "You can't delete last gpal")

@@ -18,7 +18,7 @@ class Label:
         self.lbl.bind('<Leave>', self.on_leave)
 
     def on_enter(self, event):
-        self.lbl['background'] = random.choice(settings.COLORS)
+        self.lbl['background'] = random.choice(list(settings.COLORS.values()))
         self.lbl['foreground'] = settings.BLACK
 
     def on_leave(self, event):
