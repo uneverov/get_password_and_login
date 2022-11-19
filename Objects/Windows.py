@@ -19,14 +19,6 @@ class MainWindow(tkinter.Tk):
         self.config(bg=settings.BLACK)
         self.resizable(False, True)
         self.attributes('-topmost', True)
-        self.login_lbl = tkinter.Label(self, text='l o g i n',
-                                       background=settings.BLACK,
-                                       foreground=settings.WHITE)
-        self.login_lbl.grid(column=1, row=0, padx=0, pady=5)
-        self.password_lbl = tkinter.Label(self, text='p a s s w o r d',
-                                          background=settings.BLACK,
-                                          foreground=settings.WHITE)
-        self.password_lbl.grid(column=2, row=0, padx=0, pady=5)
 
 
 class SaveCredentialWindow(tkinter.Tk):
