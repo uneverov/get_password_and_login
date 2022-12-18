@@ -2,7 +2,7 @@ import tkinter
 
 import settings
 from Objects.Button import place_buttons
-from Objects.Cryptocode import encrypt
+
 from Objects.Gpals import write_json
 
 
@@ -13,8 +13,8 @@ class MainWindow(tkinter.Tk):
         self.screenwidth = self.winfo_screenwidth()
         self.screenwidth = self.winfo_screenheight()
         self.geometry('%dx%d+%d+%d' % (
-            260, 350, self.screenwidth // 2 + 130,
-            self.screenwidth // 2 - 175))
+            240, 300, self.screenwidth//4,
+            self.screenwidth - 700))
         self.bind()
         self.config(bg=settings.BLACK)
         self.resizable(False, True)
@@ -109,9 +109,7 @@ class SaveCredentialWindow(tkinter.Tk):
     def create_gpals_button(self):
         for i in self.credential_dicts:
             self.gpals.update(
-                {i['name']: ';gpal;'.join([encrypt(i['login'], 'login'),
-                                           encrypt(i['password'],
-                                                   'password')])})
+                {i['name']: ';gpal;'.join([(i['login']), (i['password'])])})
         write_json(self.gpals)
         place_buttons(self.gpals, self.main_window)
         self.destroy()
