@@ -2,38 +2,35 @@ import random
 import tkinter
 from tkinter.messagebox import askquestion, showwarning
 
-from Objects.Cryptocode import decrypt
-
+import keyboard
 import settings
 from Objects.Gpals import Gpals, write_json
 from Objects.Label import Label
 
+login_to_paste = []
+
 
 def place_buttons(gpals, window, labels=False):
     if labels:
-        login_lbl = tkinter.Label(text='l o g i n',
+        login_lbl = tkinter.Label(text='press F2',
                                   background=settings.BLACK,
                                   foreground=settings.WHITE)
-        login_lbl.grid(column=1, row=0, padx=0, pady=5)
-        password_lbl = tkinter.Label(text='p a s s w o r d',
-                                     background=settings.BLACK,
-                                     foreground=settings.WHITE)
-        password_lbl.grid(column=2, row=0, padx=0, pady=5)
+        login_lbl.grid(column=0, row=0, padx=0, pady=5)
+        login_lbl_2 = tkinter.Label(text='to insert',
+                                    background=settings.BLACK,
+                                    foreground=settings.WHITE)
+        login_lbl_2.grid(column=1, row=0, padx=0, pady=5)
         animate_label(login_lbl['text'], login_lbl)
-        animate_label(password_lbl['text'], password_lbl)
     for i, (label, gpal) in enumerate(gpals.items()):
         gl, gp = str(gpal).split(';gpal;')
+        print(gl, gp)
         Label(window=window,
               text=label,
               grid=(0, i + 1))
         Button(window=window,
                text='get',
-               textvariable=decrypt(gl, 'login'),
+               textvariable=gpal,
                grid=(1, i + 1))
-        Button(window=window,
-               text='get',
-               textvariable=decrypt(gp, 'password'),
-               grid=(2, i + 1))
         DeleteButton(window=window,
                      text='X',
                      label=label,
@@ -49,7 +46,7 @@ def animate_label(text, login_lbl):
 
 class Button:
     def __init__(self, window, text, grid, textvariable=None, padx=None,
-                 fg=settings.ORANGE, width=9):
+                 fg=settings.ORANGE, width=18):
         self.window = window
         self.text = text
         self.textvariable = textvariable
@@ -63,8 +60,22 @@ class Button:
         self.btn.grid(column=grid[0], row=grid[1], padx=padx)
 
     def clicked(self):
-        self.window.clipboard_clear()
-        self.window.clipboard_append(str(self.textvariable))
+        login_to_paste.clear()
+        login_to_paste.extend(str(self.textvariable).split(';gpal;'))
+        print(login_to_paste)
+
+
+def onkeypress(event):
+    if event.name == 'f2':
+        print(login_to_paste)
+        try:
+            keyboard.write(login_to_paste[0])
+        except IndexError:
+            pass
+        try:
+            del login_to_paste[0]
+        except IndexError:
+            pass
 
 
 class DeleteButton:
