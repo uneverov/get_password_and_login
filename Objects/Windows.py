@@ -1,10 +1,13 @@
 import tkinter
 
+import pystray
 import settings
 from Objects.Button import place_buttons
-
 from Objects.Gpals import write_json
+from PIL import Image
+from pystray import MenuItem as item
 
+image=Image.open("favicon.png")
 
 class MainWindow(tkinter.Tk):
     def __init__(self):
@@ -16,10 +19,24 @@ class MainWindow(tkinter.Tk):
             240, 300, self.screenwidth//4,
             self.screenwidth - 700))
         self.bind()
-        self.config(bg=settings.BLACK)
+        self.config(bg=settings.COLORS['BLACK'])
         self.resizable(False, True)
         self.attributes('-topmost', True)
+        self.protocol('WM_DELETE_WINDOW', self.hide_window)
 
+    def quit_window(self, icon, item):
+       icon.stop()
+       self.destroy()
+
+    def show_window(self, icon, item):
+       icon.stop()
+       self.after(0,self.deiconify())
+
+    def hide_window(self):
+       self.withdraw()
+       menu=(item('Quit', self.quit_window), item('Show', self.show_window, default=True))
+       icon=pystray.Icon("name", image, "GPAL", menu)
+       icon.run()
 
 class SaveCredentialWindow(tkinter.Tk):
     def __init__(self, gpals, window):
@@ -28,7 +45,7 @@ class SaveCredentialWindow(tkinter.Tk):
                          'not_all_fields_filled': tkinter.Label(),
                          'not_unique_name': tkinter.Label(),
                          'succes_message': tkinter.Label()}
-        self.config(bg=settings.BLACK)
+        self.config(bg=settings.COLORS['BLACK'])
         self.main_window = window
         self.credential_dicts = []
         self.gpals = gpals
@@ -38,16 +55,16 @@ class SaveCredentialWindow(tkinter.Tk):
         self.resizable(False, False)
         self.attributes('-topmost', True)
         self.name_lbl = tkinter.Label(self, text='Name',
-                                      background=settings.BLACK,
-                                      foreground=settings.WHITE)
+                                      background=settings.COLORS['BLACK'],
+                                      foreground=settings.COLORS['WHITE'])
         self.name_lbl.grid(column=0, row=0, padx=5, pady=5)
         self.login_lbl = tkinter.Label(self, text='Login',
-                                       background=settings.BLACK,
-                                       foreground=settings.WHITE)
+                                       background=settings.COLORS['BLACK'],
+                                       foreground=settings.COLORS['WHITE'])
         self.login_lbl.grid(column=1, row=0, padx=5, pady=5)
         self.password_lbl = tkinter.Label(self, text='Password',
-                                          background=settings.BLACK,
-                                          foreground=settings.WHITE)
+                                          background=settings.COLORS['BLACK'],
+                                          foreground=settings.COLORS['WHITE'])
         self.password_lbl.grid(column=2, row=0, padx=5, pady=5)
         self.name_field = tkinter.Entry(self)
         self.name_field.grid(column=0, row=1, padx=4, pady=5)
@@ -73,15 +90,15 @@ class SaveCredentialWindow(tkinter.Tk):
         if len(credential_dict['name']) > 10:
             self.messages['too_long_name'] = tkinter.Label(self,
                                                            text='Your gpal name\n cannot exceed\n 10 characters',
-                                                           fg=settings.RED,
-                                                           background=settings.BLACK)
+                                                           fg=settings.COLORS['RED'],
+                                                           background=settings.COLORS['BLACK'])
             self.messages['too_long_name'].grid(column=1, row=4,
                                                 pady=10)
         if not all(credential_dict.values()):
             self.messages['not_all_fields_filled'] = tkinter.Label(self,
                                                                    text='All fields must be filled',
-                                                                   fg=settings.RED,
-                                                                   background=settings.BLACK)
+                                                                   fg=settings.COLORS['RED'],
+                                                                   background=settings.COLORS['BLACK'])
             self.messages['not_all_fields_filled'].grid(column=1, row=4,
                                                         pady=10)
         if (credential_dict['name'] in names
@@ -89,8 +106,8 @@ class SaveCredentialWindow(tkinter.Tk):
             self.messages['not_unique_name'] = tkinter.Label(
                 self,
                 text=f'Gpal with name\n {credential_dict["name"]}\n already exist',
-                fg=settings.RED,
-                background=settings.BLACK)
+                fg=settings.COLORS['RED'],
+                background=settings.COLORS['BLACK'])
             self.messages['not_unique_name'].grid(column=1,
                                                   row=4,
                                                   pady=10)
@@ -101,7 +118,7 @@ class SaveCredentialWindow(tkinter.Tk):
             self.messages['succes_message'] = tkinter.Label(self,
                                                             text=f'You saved {len(self.credential_dicts) + 1} gpals',
                                                             fg='green',
-                                                            background=settings.BLACK)
+                                                            background=settings.COLORS['BLACK'])
             self.messages['succes_message'].grid(column=1, row=4, pady=10)
             if credential_dict['name'] not in names:
                 self.credential_dicts.append(credential_dict)

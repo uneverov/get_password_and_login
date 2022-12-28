@@ -12,18 +12,14 @@ login_to_paste = []
 
 def place_buttons(gpals, window, labels=False):
     if labels:
-        login_lbl = tkinter.Label(text='press F2',
-                                  background=settings.BLACK,
-                                  foreground=settings.WHITE)
-        login_lbl.grid(column=0, row=0, padx=0, pady=5)
-        login_lbl_2 = tkinter.Label(text='to insert',
-                                    background=settings.BLACK,
-                                    foreground=settings.WHITE)
-        login_lbl_2.grid(column=1, row=0, padx=0, pady=5)
+        login_lbl = tkinter.Label(text='Press get button to copy F2 to insert',
+                                  background=settings.COLORS['BLACK'],
+                                  foreground=settings.COLORS['WHITE'])
+        login_lbl.grid(columnspan=2, row=0, pady=5, padx=5, sticky="W")
         animate_label(login_lbl['text'], login_lbl)
+
     for i, (label, gpal) in enumerate(gpals.items()):
         gl, gp = str(gpal).split(';gpal;')
-        print(gl, gp)
         Label(window=window,
               text=label,
               grid=(0, i + 1))
@@ -41,12 +37,13 @@ def animate_label(text, login_lbl):
     login_lbl.after(2000, animate_label, text, login_lbl)
     login_lbl['foreground'] = random.choice(
         [x for x in list(settings.COLORS.values()) if x not in
-         [settings.VIOLET, settings.BLACK, settings.RED, settings.GREEN]])
+         [settings.COLORS['VIOLET'], settings.COLORS['BLACK'],
+          settings.COLORS['RED'], settings.COLORS['GREEN']]])
 
 
 class Button:
     def __init__(self, window, text, grid, textvariable=None, padx=None,
-                 fg=settings.ORANGE, width=18):
+                 fg=settings.COLORS['ORANGE'], width=18):
         self.window = window
         self.text = text
         self.textvariable = textvariable
@@ -55,19 +52,17 @@ class Button:
                                   textvariable=textvariable,
                                   command=self.clicked,
                                   fg=fg,
-                                  background=settings.BLACK,
+                                  background=settings.COLORS['BLACK'],
                                   borderwidth=0, width=width)
         self.btn.grid(column=grid[0], row=grid[1], padx=padx)
 
     def clicked(self):
         login_to_paste.clear()
         login_to_paste.extend(str(self.textvariable).split(';gpal;'))
-        print(login_to_paste)
 
 
 def onkeypress(event):
     if event.name == 'f2':
-        print(login_to_paste)
         try:
             keyboard.write(login_to_paste[0])
         except IndexError:
@@ -87,8 +82,8 @@ class DeleteButton:
         self.btn = tkinter.Button(window,
                                   text=text,
                                   command=self.delete,
-                                  fg=settings.LILAC,
-                                  background=settings.BLACK,
+                                  fg=settings.COLORS['LILAC'],
+                                  background=settings.COLORS['BLACK'],
                                   borderwidth=0, width=3)
         self.btn.grid(column=grid[0], row=grid[1])
 
