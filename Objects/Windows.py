@@ -9,6 +9,14 @@ from pystray import MenuItem as item
 
 image=Image.open("favicon.png")
 
+def add_message(entry_chat, txt):
+    message = entry_chat.widget.get()
+    entry_chat.widget.delete(0, tkinter.END)
+    txt.configure(state="normal")
+    txt.insert(tkinter.END, '> ' + message + '\n')
+    txt.see(tkinter.END)
+    txt.configure(state="disable")
+
 class MainWindow(tkinter.Tk):
     def __init__(self):
         super().__init__()
@@ -20,9 +28,23 @@ class MainWindow(tkinter.Tk):
             self.screenwidth - 700))
         self.bind()
         self.config(bg=settings.COLORS['BLACK'])
-        self.resizable(False, True)
+        #self.resizable(False, True)
         self.attributes('-topmost', True)
         self.protocol('WM_DELETE_WINDOW', self.hide_window)
+        self.chat_frame = tkinter.Frame(background=settings.COLORS['BLACK'], height=120, width=240)
+        self.chat_frame.grid(columnspan=4, row=0)
+        self.entry_chat = tkinter.Entry(self.chat_frame, foreground='green', font=('Hack-Bold', 10), insertbackground='green', insertwidth=2, background=settings.COLORS['BLACK'], borderwidth=0)
+        self.entry_chat.focus_set()
+        self.entry_chat.place(x=5, y=95)
+        scrollbar = tkinter.Scrollbar(self.chat_frame)
+        scrollbar.place(x=223, relheight=0.97)
+        txt = tkinter.Text(self.chat_frame, height=5, width=27,
+                           background=settings.COLORS['BLACK'],
+                           font=('Hack-Bold', 10), borderwidth=0,
+                           foreground='green', state='disabled', yscrollcommand=scrollbar.set)
+        txt.place(x=0, y=0)
+        scrollbar.config(command=txt.yview)
+        self.entry_chat.bind("<Return>", lambda event: add_message(event, txt))
 
     def quit_window(self, icon, item):
        icon.stop()
@@ -51,21 +73,21 @@ class SaveCredentialWindow(tkinter.Tk):
         self.gpals = gpals
         self.title("Add new gpals")
         self.geometry('400x200')
-        self.bind()
+
         self.resizable(False, False)
         self.attributes('-topmost', True)
         self.name_lbl = tkinter.Label(self, text='Name',
                                       background=settings.COLORS['BLACK'],
                                       foreground=settings.COLORS['WHITE'])
-        self.name_lbl.grid(column=0, row=0, padx=5, pady=5)
+        self.name_lbl.grid(column=0, row=1, padx=5, pady=5)
         self.login_lbl = tkinter.Label(self, text='Login',
                                        background=settings.COLORS['BLACK'],
                                        foreground=settings.COLORS['WHITE'])
-        self.login_lbl.grid(column=1, row=0, padx=5, pady=5)
+        self.login_lbl.grid(column=1, row=1, padx=5, pady=5)
         self.password_lbl = tkinter.Label(self, text='Password',
                                           background=settings.COLORS['BLACK'],
                                           foreground=settings.COLORS['WHITE'])
-        self.password_lbl.grid(column=2, row=0, padx=5, pady=5)
+        self.password_lbl.grid(column=2, row=1, padx=5, pady=5)
         self.name_field = tkinter.Entry(self)
         self.name_field.grid(column=0, row=1, padx=4, pady=5)
         self.login_field = tkinter.Entry(self)
