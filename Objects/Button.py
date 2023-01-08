@@ -10,27 +10,21 @@ from Objects.Label import Label
 login_to_paste = []
 
 
-def place_buttons(gpals, window, labels=False):
-    if labels:
-        login_lbl = tkinter.Label(text='Press get button to copy F2 to insert',
-                                  background=settings.COLORS['BLACK'],
-                                  foreground=settings.COLORS['WHITE'])
-        login_lbl.grid(columnspan=2, row=0, pady=5, padx=5, sticky="W")
-        animate_label(login_lbl['text'], login_lbl)
+def place_buttons(gpals, window):
 
     for i, (label, gpal) in enumerate(gpals.items()):
-        gl, gp = str(gpal).split(';gpal;')
+        print(i)
         Label(window=window,
               text=label,
-              grid=(0, i + 1))
+              grid=(0, i + 2))
         Button(window=window,
                text='get',
                textvariable=gpal,
-               grid=(1, i + 1))
+               grid=(1, i + 2))
         DeleteButton(window=window,
                      text='X',
                      label=label,
-                     grid=(3, i + 1))
+                     grid=(3, i + 2))
 
 
 def animate_label(text, login_lbl):
