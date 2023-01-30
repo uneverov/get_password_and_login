@@ -11,9 +11,7 @@ login_to_paste = []
 
 
 def place_buttons(gpals, window):
-
     for i, (label, gpal) in enumerate(gpals.items()):
-        print(i)
         Label(window=window,
               text=label,
               grid=(0, i + 2))

@@ -1,6 +1,8 @@
+import threading
 import tkinter
 
 import pystray
+import requests
 import settings
 from Objects.Button import place_buttons
 from Objects.Gpals import write_json
@@ -9,17 +11,30 @@ from pystray import MenuItem as item
 
 image=Image.open("favicon.png")
 
-def add_message(entry_chat, txt):
-    message = entry_chat.widget.get()
-    entry_chat.widget.delete(0, tkinter.END)
-    txt.configure(state="normal")
-    txt.insert(tkinter.END, '> ' + message + '\n')
-    txt.see(tkinter.END)
-    txt.configure(state="disable")
+CHAT_CONTENT = '' # all messages from server
+LOGIN = None
+is_update_chat = None # do we need to update text.widget
+
+def get_chat_content():
+    while True:
+        global CHAT_CONTENT
+        global is_update_chat
+        r = requests.get('http://194.58.107.248:20/')
+        if len(r.content.decode()) > len(CHAT_CONTENT):
+            CHAT_CONTENT = r.content.decode()
+            is_update_chat = True
+
+
+get_chat_content = threading.Thread(target=get_chat_content)
+get_chat_content.start()
 
 class MainWindow(tkinter.Tk):
     def __init__(self):
         super().__init__()
+        self.login = None
+        self.txt = None
+        self.scrollbar = None
+        self.entry_chat = None
         self.title("GPAL")
         self.screenwidth = self.winfo_screenwidth()
         self.screenwidth = self.winfo_screenheight()
@@ -31,20 +46,83 @@ class MainWindow(tkinter.Tk):
         #self.resizable(False, True)
         self.attributes('-topmost', True)
         self.protocol('WM_DELETE_WINDOW', self.hide_window)
-        self.chat_frame = tkinter.Frame(background=settings.COLORS['BLACK'], height=120, width=240)
+        self.chat_frame = tkinter.Frame(background=settings.COLORS['BLACK'],
+                                        height=120, width=240)
+        self.chat_widget()
+        self.update_chat()
+
+    def update_chat(self):
+        global LOGIN
+        LOGIN = self.login
+        global is_update_chat
+        self.after(5000, self.update_chat)
+        if LOGIN and is_update_chat:
+            self.txt.configure(foreground='green')
+            self.txt.configure(state="normal")
+            self.txt.delete('1.0', tkinter.END)
+            self.txt.insert(tkinter.END, f'{CHAT_CONTENT}')
+            self.txt.configure(state="disable")
+            self.txt.see(tkinter.END)
+            is_update_chat = False
+
+    def chat_widget(self):
+        self.chat_frame = tkinter.Frame(background=settings.COLORS['BLACK'],
+                                        height=120, width=240)
         self.chat_frame.grid(columnspan=4, row=0)
-        self.entry_chat = tkinter.Entry(self.chat_frame, foreground='green', font=('Hack-Bold', 10), insertbackground='green', insertwidth=2, background=settings.COLORS['BLACK'], borderwidth=0)
+        self.entry_chat = tkinter.Entry(self.chat_frame, foreground='green',
+                                        font=('Hack-Bold', 10),
+                                        insertbackground='green',
+                                        insertwidth=2,
+                                        background=settings.COLORS['BLACK'],
+                                        borderwidth=0)
         self.entry_chat.focus_set()
         self.entry_chat.place(x=5, y=95)
-        scrollbar = tkinter.Scrollbar(self.chat_frame)
-        scrollbar.place(x=223, relheight=0.97)
-        txt = tkinter.Text(self.chat_frame, height=5, width=27,
+        self.scrollbar = tkinter.Scrollbar(self.chat_frame)
+        self.scrollbar.place(x=223, relheight=0.97)
+        self.txt = tkinter.Text(self.chat_frame, height=5, width=27,
                            background=settings.COLORS['BLACK'],
                            font=('Hack-Bold', 10), borderwidth=0,
-                           foreground='green', state='disabled', yscrollcommand=scrollbar.set)
-        txt.place(x=0, y=0)
-        scrollbar.config(command=txt.yview)
-        self.entry_chat.bind("<Return>", lambda event: add_message(event, txt))
+                           foreground='green', state='disabled',
+                           yscrollcommand=self.scrollbar.set)
+        self.txt.place(x=0, y=0)
+        self.txt.see(tkinter.END)
+        self.scrollbar.config(command=self.txt.yview)
+        self.entry_chat.bind("<Return>", lambda event: self.add_message())
+
+    def add_message(self, message=None):
+        if not message:
+            message = self.entry_chat.get()
+        if message.startswith('login: '):
+            self.txt.configure(state="normal")
+            self.login = message.replace('login: ', '')
+            self.entry_chat.delete(0, tkinter.END)
+            self.txt.tag_config("red", foreground="red")
+            self.txt.tag_add("red", f"{self.txt.index('end')}", "end")
+            self.txt.insert(tkinter.END, f'<---  Hello {self.login}  --->\n')
+            self.txt.configure(state="disable")
+            self.txt.see(tkinter.END)
+        if not self.login:
+            self.txt.configure(foreground='red')
+            self.txt.configure(state="normal")
+            self.entry_chat.delete(0, tkinter.END)
+            self.txt.tag_config("red", foreground="red")
+            self.txt.insert(tkinter.END, '> ' + 'You should login first' + '\n' + 'send login: your_login\n')
+            self.txt.configure(state="disable")
+            self.txt.see(tkinter.END)
+        else:
+            if not message.startswith('login: '):
+                self.txt.configure(state="normal")
+                self.txt.tag_config("green", foreground="green")
+                self.txt.tag_add("green", f"{self.txt.index('end-2c')}", "end")
+                params = {'login': {self.login}, 'message': message}
+                requests.post('http://194.58.107.248:20/', params=params)
+                self.entry_chat.delete(0, tkinter.END)
+                self.txt.configure(state="normal")
+                self.txt.insert(tkinter.END, f'> {self.login}: ' + message + '\n')
+                self.txt.configure(state="disable")
+                self.txt.see(tkinter.END)
+
+
 
     def quit_window(self, icon, item):
        icon.stop()
