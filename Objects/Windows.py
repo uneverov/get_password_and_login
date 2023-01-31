@@ -8,7 +8,7 @@ from Objects.Button import place_buttons
 from Objects.Gpals import write_json
 from PIL import Image
 from pystray import MenuItem as item
-
+from server import host_name, server_port
 image=Image.open("favicon.png")
 
 CHAT_CONTENT = '' # all messages from server
@@ -19,7 +19,7 @@ def get_chat_content():
     while True:
         global CHAT_CONTENT
         global is_update_chat
-        r = requests.get('http://194.58.107.248:20/')
+        r = requests.get(f'http://{host_name}:{server_port}/')
         if len(r.content.decode()) > len(CHAT_CONTENT):
             CHAT_CONTENT = r.content.decode()
             is_update_chat = True
@@ -43,7 +43,7 @@ class MainWindow(tkinter.Tk):
             self.screenwidth - 700))
         self.bind()
         self.config(bg=settings.COLORS['BLACK'])
-        #self.resizable(False, True)
+        self.resizable(False, True)
         self.attributes('-topmost', True)
         self.protocol('WM_DELETE_WINDOW', self.hide_window)
         self.chat_frame = tkinter.Frame(background=settings.COLORS['BLACK'],
@@ -115,13 +115,13 @@ class MainWindow(tkinter.Tk):
                 self.txt.tag_config("green", foreground="green")
                 self.txt.tag_add("green", f"{self.txt.index('end-2c')}", "end")
                 params = {'login': {self.login}, 'message': message}
-                requests.post('http://194.58.107.248:20/', params=params)
+                requests.post(f'http://{host_name}:{server_port}/',
+                              params=params)
                 self.entry_chat.delete(0, tkinter.END)
                 self.txt.configure(state="normal")
                 self.txt.insert(tkinter.END, f'> {self.login}: ' + message + '\n')
                 self.txt.configure(state="disable")
                 self.txt.see(tkinter.END)
-
 
 
     def quit_window(self, icon, item):
