@@ -86,9 +86,10 @@ class DeleteButton:
             if answer == 'yes':
                 grid_objects = self.window.grid_slaves()
                 for grid_object in grid_objects:
-                    grid_object.destroy()
+                    if not isinstance(grid_object, tkinter.Frame):
+                        grid_object.destroy()
                 del self.gpals.gpals[self.label]
                 write_json(self.gpals.gpals)
-                place_buttons(self.gpals.gpals, self.window, labels=True)
+                place_buttons(self.gpals.gpals, self.window)
         else:
             showwarning("Noup", "You can't delete last gpal")
