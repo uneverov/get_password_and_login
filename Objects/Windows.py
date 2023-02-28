@@ -8,20 +8,28 @@ from Objects.Button import place_buttons
 from Objects.Gpals import write_json
 from PIL import Image
 from pystray import MenuItem as item
+from requests.exceptions import ConnectionError
+
+from db import get_logins, add_login_password
 from server import host_name, server_port
+
 image=Image.open("favicon.png")
 
 CHAT_CONTENT = '' # all messages from server
 LOGIN = None
 is_update_chat = None # do we need to update text.widget
+connection = None
 
 def get_chat_content():
     while True:
-        global CHAT_CONTENT
-        global is_update_chat
-        r = requests.get(f'http://{host_name}:{server_port}/')
-        if len(r.content.decode()) > len(CHAT_CONTENT):
-            CHAT_CONTENT = r.content.decode()
+        global CHAT_CONTENT, connection, is_update_chat
+        try:
+            connection = requests.get(f'http://{host_name}:{server_port}/')
+        except ConnectionError:
+            tkinter.messagebox.showwarning("ConnectionError",
+                                           "Server is unavailable")
+        if connection and len(connection.content.decode()) > len(CHAT_CONTENT):
+            CHAT_CONTENT = connection.content.decode()
             is_update_chat = True
 
 
@@ -31,6 +39,7 @@ get_chat_content.start()
 class MainWindow(tkinter.Tk):
     def __init__(self):
         super().__init__()
+        self.password = None
         self.login = None
         self.txt = None
         self.scrollbar = None
@@ -52,11 +61,11 @@ class MainWindow(tkinter.Tk):
         self.update_chat()
 
     def update_chat(self):
-        global LOGIN
-        LOGIN = self.login
+        #global LOGIN
+        #LOGIN = self.login
         global is_update_chat
         self.after(5000, self.update_chat)
-        if LOGIN and is_update_chat:
+        if self.login and self.password and is_update_chat:
             self.txt.configure(foreground='green')
             self.txt.configure(state="normal")
             self.txt.delete('1.0', tkinter.END)
@@ -95,13 +104,32 @@ class MainWindow(tkinter.Tk):
         if message.startswith('login: '):
             self.txt.configure(state="normal")
             self.login = message.replace('login: ', '')
-            self.entry_chat.delete(0, tkinter.END)
-            self.txt.tag_config("red", foreground="red")
-            self.txt.tag_add("red", f"{self.txt.index('end')}", "end")
-            self.txt.insert(tkinter.END, f'<---  Hello {self.login}  --->\n')
-            self.txt.configure(state="disable")
-            self.txt.see(tkinter.END)
-        if not self.login:
+            print(get_logins())
+            if self.login and self.login not in get_logins():
+                self.entry_chat.delete(0, tkinter.END)
+                self.txt.tag_config("red", foreground="red")
+                self.txt.tag_add("red", f"{self.txt.index('end')}", "end")
+                self.txt.insert(tkinter.END,
+                                '> ' + 'Please set your password' +
+                                '\n' + 'send password: your_password\n')
+                self.txt.configure(state="disable")
+                self.txt.see(tkinter.END)
+            if self.login and self.login in get_logins():
+                self.entry_chat.delete(0, tkinter.END)
+                self.txt.tag_config("red", foreground="red")
+                self.txt.tag_add("red", f"{self.txt.index('end')}", "end")
+                self.txt.insert(tkinter.END,
+                                '> ' + 'send password: your_password\n')
+                self.txt.configure(state="disable")
+                self.txt.see(tkinter.END)
+        if message.startswith('password: ') and self.login not in get_logins():
+            self.txt.configure(state="normal")
+            self.password = message.replace('password: ', '')
+            add_login_password(self.login, self.password)
+        if message.startswith('password: ') and self.login not in get_logins():
+            self.txt.configure(state="normal")
+            self.password = message.replace('password: ', '')
+        if not self.login and not self.password:
             self.txt.configure(foreground='red')
             self.txt.configure(state="normal")
             self.entry_chat.delete(0, tkinter.END)
@@ -109,7 +137,17 @@ class MainWindow(tkinter.Tk):
             self.txt.insert(tkinter.END, '> ' + 'You should login first' + '\n' + 'send login: your_login\n')
             self.txt.configure(state="disable")
             self.txt.see(tkinter.END)
-        else:
+        if self.login and not self.password:
+            self.txt.configure(foreground='red')
+            self.txt.configure(state="normal")
+            self.entry_chat.delete(0, tkinter.END)
+            self.txt.tag_config("red", foreground="red")
+            self.txt.insert(tkinter.END,
+                            '> ' + 'Please set your password' +
+                            '\n' + 'send password: your_password\n')
+            self.txt.configure(state="disable")
+            self.txt.see(tkinter.END)
+        if self.login and self.password:
             if not message.startswith('login: '):
                 self.txt.configure(state="normal")
                 self.txt.tag_config("green", foreground="green")
