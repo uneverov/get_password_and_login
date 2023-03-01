@@ -44,7 +44,6 @@ class MainWindow(tkinter.Tk):
         self.scrollbar = None
         self.entry_chat = None
         self.title("GPAL")
-        self.screenwidth = self.winfo_screenwidth()
         self.screenwidth = self.winfo_screenheight()
         self.geometry('%dx%d+%d+%d' % (
             240, 300, self.screenwidth//4,
@@ -101,14 +100,11 @@ class MainWindow(tkinter.Tk):
         if message.startswith('login: '):
             self.txt.configure(state="normal")
             self.login = message.replace('login: ', '')
-            print(get_logins())
             if self.login and self.login not in get_logins():
                 self.entry_chat.delete(0, tkinter.END)
                 self.txt.tag_config("red", foreground="red")
                 self.txt.tag_add("red", f"{self.txt.index('end')}", "end")
-                self.txt.insert(tkinter.END,
-                                '> ' + 'Please set your password' +
-                                '\n' + 'send password: your_password\n')
+                self.txt.insert(tkinter.END, 'send password: your_password\n')
                 self.txt.configure(state="disable")
                 self.txt.see(tkinter.END)
             if self.login and self.login in get_logins():
@@ -141,7 +137,7 @@ class MainWindow(tkinter.Tk):
             self.txt.configure(state="normal")
             self.entry_chat.delete(0, tkinter.END)
             self.txt.tag_config("red", foreground="red")
-            self.txt.insert(tkinter.END, '> ' + 'You should login first' + '\n' + 'send login: your_login\n')
+            self.txt.insert(tkinter.END, 'send login: your_login\n')
             self.txt.configure(state="disable")
             self.txt.see(tkinter.END)
         if self.login and not self.password and self.login not in get_logins():
@@ -149,9 +145,7 @@ class MainWindow(tkinter.Tk):
             self.txt.configure(state="normal")
             self.entry_chat.delete(0, tkinter.END)
             self.txt.tag_config("red", foreground="red")
-            self.txt.insert(tkinter.END,
-                            '> ' + 'Please set your password' +
-                            '\n' + 'send password: your_password\n')
+            self.txt.insert(tkinter.END, 'send password: your_password\n')
             self.txt.configure(state="disable")
             self.txt.see(tkinter.END)
         if self.login and self.password:
