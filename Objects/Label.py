@@ -27,3 +27,15 @@ class Label:
     def on_leave(self, event):
         self.lbl['background'] = settings.COLORS['BLACK']
         self.lbl['foreground'] = settings.COLORS['WHITE']
+
+# class AnimateLabel:
+#     def __init__(self, window, text, x, y):
+#         self.txt = text
+#         self.lbl = tkinter.Label(window, font='Bell 12 bold', width=len(self.txt))
+#         self.lbl.place(x=x, y=y)
+#         window.after(1000, self.animate_label, self.txt)
+#
+#     def animate_label(self, text, n=0):
+#         if n < len(text) - 1:
+#             self.lbl.after(500, self.animate_label, text, n+1)
+#         self.lbl['text'] = text[:n+1]

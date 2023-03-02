@@ -10,23 +10,27 @@ from PIL import Image
 from pystray import MenuItem as item
 from requests.exceptions import ConnectionError
 
+
 from db import get_logins, add_login_password, get_password
 from server import host_name, server_port
 
-image=Image.open("favicon.png")
+image = Image.open("favicon.png")
 
 CHAT_CONTENT = '' # all messages from server
 is_update_chat = None # do we need to update text.widget
 connection = None
+server_status = 'Off'
+
 
 def get_chat_content():
     while True:
-        global CHAT_CONTENT, connection, is_update_chat
+        global CHAT_CONTENT, connection, is_update_chat, server_status
         try:
             connection = requests.get(f'http://{host_name}:{server_port}/')
+            if connection.status_code == 200:
+                server_status = 'On'
         except ConnectionError:
-            tkinter.messagebox.showwarning("ConnectionError",
-                                           "Server is unavailable")
+            server_status = 'Off'
         if connection and len(connection.content.decode()) > len(CHAT_CONTENT):
             CHAT_CONTENT = connection.content.decode()
             is_update_chat = True
@@ -38,6 +42,7 @@ get_chat_content.start()
 class MainWindow(tkinter.Tk):
     def __init__(self):
         super().__init__()
+        self.server_status = None
         self.password = None
         self.login = None
         self.txt = None
@@ -50,7 +55,7 @@ class MainWindow(tkinter.Tk):
             self.screenwidth - 700))
         self.bind()
         self.config(bg=settings.COLORS['BLACK'])
-        self.resizable(False, True)
+        self.resizable(True, True)
         self.attributes('-topmost', True)
         self.protocol('WM_DELETE_WINDOW', self.hide_window)
         self.chat_frame = tkinter.Frame(background=settings.COLORS['BLACK'],
@@ -59,7 +64,14 @@ class MainWindow(tkinter.Tk):
         self.update_chat()
 
     def update_chat(self):
-        global is_update_chat
+        global is_update_chat, server_status
+        self.server_status = tkinter.Canvas(self, width=6, height=6,
+                                            bg="white", highlightthickness=1)
+        self.server_status.place(x=212, y=3)
+        if server_status == 'On':
+            self.server_status.configure(bg='green')
+        if server_status == 'Off':
+            self.server_status.configure(bg='red')
         self.after(5000, self.update_chat)
         if self.login and self.password and is_update_chat:
             self.txt.configure(foreground='green')
@@ -161,7 +173,6 @@ class MainWindow(tkinter.Tk):
                 self.txt.insert(tkinter.END, f'> {self.login}: ' + message + '\n')
                 self.txt.configure(state="disable")
                 self.txt.see(tkinter.END)
-
 
     def quit_window(self, icon, item):
        icon.stop()
