@@ -9,8 +9,8 @@ class MyServer(BaseHTTPRequestHandler):
     def do_POST(self):
         login = unquote(self.path, encoding='utf-8').split('&')[0].replace('login=', '').replace('/?', '')
         message = unquote(self.path, encoding='utf-8').split('&')[1].replace('message=', '')
-        message.replace('password:', '').replace('password: ', '')
-        self.chat_text.append(f'> {login}: {message}\n')
+        if 'password' not in message:
+            self.chat_text.append(f'> {login}: {message}\n')
         self.send_response(200)
         self.end_headers()
 
