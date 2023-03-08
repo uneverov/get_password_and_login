@@ -152,14 +152,6 @@ class MainWindow(tkinter.Tk):
             self.txt.insert(tkinter.END, 'send login: your_login\n')
             self.txt.configure(state="disable")
             self.txt.see(tkinter.END)
-        if self.login and not self.password and self.login not in get_logins():
-            self.txt.configure(foreground='red')
-            self.txt.configure(state="normal")
-            self.entry_chat.delete(0, tkinter.END)
-            self.txt.tag_config("red", foreground="red")
-            self.txt.insert(tkinter.END, 'send password: your_password\n')
-            self.txt.configure(state="disable")
-            self.txt.see(tkinter.END)
         if self.login and self.password:
             if not message.startswith('login: '):
                 self.txt.configure(state="normal")
