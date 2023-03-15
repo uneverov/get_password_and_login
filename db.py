@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import pymysql
-conn = pymysql.connect(host='194.58.107.248',
+
+import settings
+
+conn = pymysql.connect(host=settings.host_name,
                        user='user_1',
                        passwd='WK_GOD_wk_number_1',
                        db='PTEYA')

@@ -12,7 +12,7 @@ from requests.exceptions import ConnectionError
 
 
 from db import get_logins, add_login_password, get_password
-from server import host_name, server_port
+from settings import host_name, server_port
 
 image = Image.open("favicon.png")
 
@@ -130,7 +130,7 @@ class MainWindow(tkinter.Tk):
             self.txt.configure(state="normal")
             self.password = message.replace('password: ', '')
             add_login_password(self.login, self.password)
-        if message.startswith('password: ') and self.login in get_logins():
+        if message.startswith('password: ') and self.login in get_logins() and self.login is not None:
             self.txt.configure(state="normal")
             password = message.replace('password: ', '')
             if password == get_password(self.login):
@@ -161,10 +161,6 @@ class MainWindow(tkinter.Tk):
                 requests.post(f'http://{host_name}:{server_port}/',
                               params=params)
                 self.entry_chat.delete(0, tkinter.END)
-                self.txt.configure(state="normal")
-                self.txt.insert(tkinter.END, f'> {self.login}: ' + message + '\n')
-                self.txt.configure(state="disable")
-                self.txt.see(tkinter.END)
 
     def quit_window(self, icon, item):
        icon.stop()
